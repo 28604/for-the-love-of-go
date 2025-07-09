@@ -74,3 +74,37 @@ func TestMultiply(t *testing.T) {
 		}
 	}
 }
+
+func TestDivide(t *testing.T) {
+	t.Parallel()
+	type testCase struct {
+		a, b float64
+		want float64
+	}
+	testCases := []testCase{
+		{a: 2, b: 1, want: 2},
+		{a: -6, b: 2, want: -3},
+		{a: 10, b: 2, want: 5},
+	}
+	for _, tc := range testCases {
+		got, err := calculator.Divide(tc.a, tc.b)
+		if err != nil {
+			// t.Fatalf checks validity,
+			// if not, exits the test immediately.
+			t.Fatalf("Want no error for valid input, got %v", err)
+		}
+		if tc.want != got {
+			// t.Errorf checks correctness,
+			// if not, marks the test as failed, but continues executing the test.
+			t.Errorf("Divide(%f, %f): want %f, got %f", tc.a, tc.b, tc.want, got)
+		}
+	}
+}
+
+func TestInvalidInput(t *testing.T) {
+	t.Parallel()
+	_, err := calculator.Divide(1, 0)
+	if err == nil {
+		t.Errorf("Want error for invalid input, got nil.")
+	}
+}
