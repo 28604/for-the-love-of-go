@@ -14,6 +14,9 @@ import (
 	"testing"
 
 	"github.com/28604/for-the-love-of-go/bookstore"
+	// To use cmp package, we must update the module with:
+	// $ go mod tidy
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestBook(t *testing.T) {
@@ -53,5 +56,23 @@ func TestBuyErrorsIfNoCopiesLeft(t *testing.T) {
 	_, err := bookstore.Buy(b)
 	if err == nil {
 		t.Error("Want error buying from zero copies, got nil.")
+	}
+}
+
+func TestGetAllBooks(t *testing.T) {
+	t.Parallel()
+	catalog := []bookstore.Book{
+		{Title: "Title 1"},
+		{Title: "Title 2"},
+	}
+	want := []bookstore.Book{
+		{Title: "Title 1"},
+		{Title: "Title 2"},
+	}
+	got := bookstore.GetAllBooks(catalog)
+	// Equal compares slices and other data types that cannot be compare with "==".
+	// Diff shows the difference between the two objects.
+	if !cmp.Equal(want, got) {
+		t.Error(cmp.Diff(want, got))
 	}
 }
