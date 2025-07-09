@@ -1,7 +1,10 @@
 // Package calculator does simple calculations.
 package calculator
 
-import "errors"
+import (
+	"errors"
+	"math"
+)
 
 // Add takes two numbers and return the sum.
 func Add(a, b float64) float64 {
@@ -22,4 +25,11 @@ func Divide(a, b float64) (float64, error) {
 		return 0, errors.New("division by zero not allowed")
 	}
 	return a / b, nil
+}
+
+func Sqrt(a float64) (float64, error) {
+	if a < 0 {
+		return 0, errors.New("no real number solution")
+	}
+	return math.Sqrt(a), nil
 }
