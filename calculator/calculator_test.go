@@ -1,3 +1,7 @@
+// Testing process
+// 1. Red: write a failing test.
+// 2. Green: implement the code to make it pass.
+// 3. Refactor: refactor the code and the test.
 package calculator_test
 
 import (
