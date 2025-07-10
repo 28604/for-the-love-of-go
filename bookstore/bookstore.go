@@ -8,10 +8,12 @@ import (
 // To use the struct Book outside of the "bookstore" package,
 // we must capitalised the first letter of the struct "Book".
 type Book struct {
-	ID     int
-	Title  string
-	Author string
-	Copies int
+	ID              int
+	Title           string
+	Author          string
+	Copies          int
+	PriceCents      int
+	DiscountPercent int
 }
 
 func Buy(b Book) (Book, error) {
@@ -43,4 +45,11 @@ func GetBook(catalog map[int]Book, ID int) (Book, error) {
 		return Book{}, fmt.Errorf("ID %d does not exist", ID)
 	}
 	return b, nil
+}
+
+// Method is a function of a type of objects.
+// Think of method as a dynamic struct field that computes upon calling it.
+// A method must be defined in the same package as the type.
+func (b Book) NetPriceCents() int {
+	return b.PriceCents * (100 - b.DiscountPercent) / 100
 }
