@@ -11,6 +11,7 @@
 package bookstore_test
 
 import (
+	"sort"
 	"testing"
 
 	"github.com/28604/for-the-love-of-go/bookstore"
@@ -61,15 +62,22 @@ func TestBuyErrorsIfNoCopiesLeft(t *testing.T) {
 
 func TestGetAllBooks(t *testing.T) {
 	t.Parallel()
-	catalog := []bookstore.Book{
-		{Title: "Title 1"},
-		{Title: "Title 2"},
+	catalog := map[int]bookstore.Book{
+		1: {ID: 1, Title: "Title 1"},
+		2: {ID: 2, Title: "Title 2"},
 	}
 	want := []bookstore.Book{
-		{Title: "Title 1"},
-		{Title: "Title 2"},
+		{ID: 1, Title: "Title 1"},
+		{ID: 2, Title: "Title 2"},
 	}
 	got := bookstore.GetAllBooks(catalog)
+	// sort.Slice sorts the given slice according to the provided less function.
+	// In this case, got is sorted in ascending order for the ID field.
+	sort.Slice(got, func(i, j int) bool {
+		// Though it is valid to refer to fields of map using got[i].ID,
+		// it is invalid to assign values to it, e.g. got[i].ID = 1 (won't work).
+		return got[i].ID < got[j].ID
+	})
 	// Equal compares slices and other data types that cannot be compare with "==".
 	// Diff shows the difference between the two objects.
 	if !cmp.Equal(want, got) {
@@ -79,13 +87,25 @@ func TestGetAllBooks(t *testing.T) {
 
 func TestGetBook(t *testing.T) {
 	t.Parallel()
-	catalog := []bookstore.Book{
-		{ID: 1, Title: "Title 1"},
-		{ID: 2, Title: "Title 2"},
+	catalog := map[int]bookstore.Book{
+		1: {ID: 1, Title: "Title 1"},
+		2: {ID: 2, Title: "Title 2"},
 	}
 	want := bookstore.Book{ID: 2, Title: "Title 2"}
-	got := bookstore.GetBook(catalog, 2)
+	got, err := bookstore.GetBook(catalog, 2)
+	if err != nil {
+		t.Fatal(err)
+	}
 	if !cmp.Equal(want, got) {
 		t.Error(cmp.Diff(want, got))
+	}
+}
+
+func TestGetBookBadID(t *testing.T) {
+	t.Parallel()
+	catalog := map[int]bookstore.Book{}
+	_, err := bookstore.GetBook(catalog, 999)
+	if err == nil {
+		t.Error("Want error for non-existent ID, got nil.")
 	}
 }
