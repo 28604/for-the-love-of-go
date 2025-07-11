@@ -122,3 +122,28 @@ func TestNetPriceCents(t *testing.T) {
 		t.Errorf("want %d, got %d", want, got)
 	}
 }
+
+func TestSetPriceCents(t *testing.T) {
+	t.Parallel()
+	b := bookstore.Book{ID: 3, PriceCents: 2000}
+	want := 1500
+	err := b.SetPriceCents(want)
+	// This line below does the same thing, but explicitly.
+	// err := (&b).SetPriceCents(want)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := b.PriceCents
+	if want != got {
+		t.Errorf("want %d, got %d", want, got)
+	}
+}
+
+func TestSetPriceCentsBadPrice(t *testing.T) {
+	t.Parallel()
+	b := bookstore.Book{ID: 3, PriceCents: 2000}
+	err := b.SetPriceCents(-1)
+	if err == nil {
+		t.Fatal(err)
+	}
+}

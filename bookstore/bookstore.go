@@ -57,3 +57,15 @@ func (c Catalog) GetBook(ID int) (Book, error) {
 func (b Book) NetPriceCents() int {
 	return b.PriceCents * (100 - b.DiscountPercent) / 100
 }
+
+// As long as we specify the object type as a pointer,
+// Go would auto-dereference the pointer for us even when we call the method
+// like b.SetPriceCents(123), rather than (&b).SetPriceCents(123).
+func (b *Book) SetPriceCents(price int) error {
+	if price < 0 {
+		err := fmt.Errorf("negative price %d", price)
+		return err
+	}
+	b.PriceCents = price
+	return nil
+}
