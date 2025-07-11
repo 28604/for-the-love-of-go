@@ -18,6 +18,7 @@ import (
 	// To use cmp package, we must update the module with:
 	// $ go mod tidy
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
 func TestBook(t *testing.T) {
@@ -80,7 +81,7 @@ func TestGetAllBooks(t *testing.T) {
 	})
 	// Equal compares slices and other data types that cannot be compare with "==".
 	// Diff shows the difference between the two objects.
-	if !cmp.Equal(want, got) {
+	if !cmp.Equal(want, got, cmpopts.IgnoreUnexported(bookstore.Book{})) {
 		t.Error(cmp.Diff(want, got))
 	}
 }
@@ -96,7 +97,10 @@ func TestGetBook(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !cmp.Equal(want, got) {
+	if !cmp.Equal(want, got, cmpopts.IgnoreUnexported(bookstore.Book{})) {
+		// Adding an unexported field makes the TestGetBook fail
+		// because cmp cannot access unexported fields.
+		// To compare Book, we now can use compopts.IgnoreUnexported
 		t.Error(cmp.Diff(want, got))
 	}
 }
@@ -144,6 +148,29 @@ func TestSetPriceCentsBadPrice(t *testing.T) {
 	b := bookstore.Book{ID: 3, PriceCents: 2000}
 	err := b.SetPriceCents(-1)
 	if err == nil {
+		t.Fatal("Want err for invalid price, got nil.")
+	}
+}
+
+func TestSetCategory(t *testing.T) {
+	t.Parallel()
+	b := bookstore.Book{ID: 1, Title: "Title 1"}
+	want := "Autobiography"
+	err := b.SetCategory(want)
+	if err != nil {
 		t.Fatal(err)
+	}
+	got := b.Category()
+	if want != got {
+		t.Errorf("want %q, got %q", want, got)
+	}
+}
+
+func TestSetCategoryInvalid(t *testing.T) {
+	t.Parallel()
+	b := bookstore.Book{ID: 3, Title: "Title 1"}
+	err := b.SetCategory("Invalid Category")
+	if err == nil {
+		t.Fatal("Want error for invalid category, got nil.")
 	}
 }

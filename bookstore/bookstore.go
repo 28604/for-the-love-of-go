@@ -14,6 +14,10 @@ type Book struct {
 	Copies          int
 	PriceCents      int
 	DiscountPercent int
+	// Adding an unexported field makes the TestGetBook fail
+	// because cmp cannot access unexported fields.
+	// To compare Book, we now can use compopts.IgnoreUnexported
+	category string
 }
 
 type Catalog map[int]Book
@@ -68,4 +72,18 @@ func (b *Book) SetPriceCents(price int) error {
 	}
 	b.PriceCents = price
 	return nil
+}
+
+func (b *Book) SetCategory(category string) error {
+	if category != "Autobiography" {
+		err := fmt.Errorf("category %q is invalid", category)
+		return err
+	}
+	b.category = category
+	return nil
+}
+
+// Category is an accessor method which allow user to access unexported field.
+func (b Book) Category() string {
+	return b.category
 }
