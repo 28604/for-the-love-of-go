@@ -75,3 +75,26 @@ func TestStringUpperCaser(t *testing.T) {
 		t.Errorf("want %s, got %s", want, got)
 	}
 }
+
+func TestDouble(t *testing.T) {
+	t.Parallel()
+	var x int = 2
+	want := 4
+	// Parameters are assed by value,
+	// so Double(x) will not change x if passing in an int.
+	// &x is of type pointer to int.
+	mytypes.Double(&x)
+	if want != x {
+		t.Errorf("want %d got %d", want, x)
+	}
+}
+
+func TestMyIntDouble(t *testing.T) {
+	t.Parallel()
+	x := mytypes.MyInt(12)
+	want := mytypes.MyInt(24)
+	(&x).MyIntDouble()
+	if want != x {
+		t.Errorf("want %d, got %d", want, x)
+	}
+}
