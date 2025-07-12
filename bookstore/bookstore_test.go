@@ -155,21 +155,27 @@ func TestSetPriceCentsBadPrice(t *testing.T) {
 func TestSetCategory(t *testing.T) {
 	t.Parallel()
 	b := bookstore.Book{ID: 1, Title: "Title 1"}
-	want := "Autobiography"
-	err := b.SetCategory(want)
-	if err != nil {
-		t.Fatal(err)
+	cats := []bookstore.Category{
+		bookstore.CategoryAutobiography,
+		bookstore.CategoryLargePrintRomance,
+		bookstore.CategoryParticlePhysics,
 	}
-	got := b.Category()
-	if want != got {
-		t.Errorf("want %q, got %q", want, got)
+	for _, cat := range cats {
+		err := b.SetCategory(cat)
+		if err != nil {
+			t.Fatal(err)
+		}
+		got := b.Category()
+		if cat != got {
+			t.Errorf("want %q, got %q", cat, got)
+		}
 	}
 }
 
 func TestSetCategoryInvalid(t *testing.T) {
 	t.Parallel()
 	b := bookstore.Book{ID: 3, Title: "Title 1"}
-	err := b.SetCategory("Invalid Category")
+	err := b.SetCategory(999)
 	if err == nil {
 		t.Fatal("Want error for invalid category, got nil.")
 	}

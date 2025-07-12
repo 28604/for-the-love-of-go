@@ -5,6 +5,30 @@ import (
 	"fmt"
 )
 
+type Catalog map[int]Book
+
+type Category int
+
+// const (
+// 	CategoryAutobiography     = "Autobiography"
+// 	CategoryLargePrintRomance = "Large Print Romance"
+// 	CategoryParticlePhysics   = "Particle Physics"
+// )
+
+const (
+	// By declaring the first constant as "Category" type, others would follow.
+	// iota enumerates value as 0, 1, 2, etc. for the constants.
+	CategoryAutobiography Category = iota
+	CategoryLargePrintRomance
+	CategoryParticlePhysics
+)
+
+var validCategory = map[Category]bool{
+	CategoryAutobiography:     true,
+	CategoryLargePrintRomance: true,
+	CategoryParticlePhysics:   true,
+}
+
 // To use the struct Book outside of the "bookstore" package,
 // we must capitalised the first letter of the struct "Book".
 type Book struct {
@@ -17,10 +41,8 @@ type Book struct {
 	// Adding an unexported field makes the TestGetBook fail
 	// because cmp cannot access unexported fields.
 	// To compare Book, we now can use compopts.IgnoreUnexported
-	category string
+	category Category
 }
-
-type Catalog map[int]Book
 
 func Buy(b Book) (Book, error) {
 	if b.Copies == 0 {
@@ -74,8 +96,15 @@ func (b *Book) SetPriceCents(price int) error {
 	return nil
 }
 
-func (b *Book) SetCategory(category string) error {
-	if category != "Autobiography" {
+func (b *Book) SetCategory(category Category) error {
+	// The brute force lookup.
+	// if category != "Autobiography" {
+	// 	err := fmt.Errorf("category %q is invalid", category)
+	// 	return err
+	// }
+
+	// The mapping lookup.
+	if !validCategory[category] {
 		err := fmt.Errorf("category %q is invalid", category)
 		return err
 	}
@@ -84,6 +113,6 @@ func (b *Book) SetCategory(category string) error {
 }
 
 // Category is an accessor method which allow user to access unexported field.
-func (b Book) Category() string {
+func (b Book) Category() Category {
 	return b.category
 }
